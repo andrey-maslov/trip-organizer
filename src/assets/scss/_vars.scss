@@ -1,0 +1,60 @@
+$font-default: 'PT Sans', sans-serif;
+$font-mono: 'Jetbrains Mono', sans-serif;
+
+///Colors
+
+//DARK THEME COLORS
+
+/// OK/NO colors
+$danger: #D8596C;
+$warning: #FF9D48;
+$success: #26AF7E;
+
+//Decoration
+
+///Typography
+$h1-fontsize: 2rem;
+$h2-fontsize: 1.75rem;
+$h3-fontsize: 1.5rem;
+$h4-fontsize: 1.25rem;
+$h5-fontsize: 1rem;
+$h6-fontsize: .8rem;
+
+//Brands Colors
+$facebook: #3b5998;
+$linkedin: #0077b5;
+$google: #ea4335;
+$twitter: #1DA1F2;
+$vk: #4680C2;
+$telegram: #0088cc;
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: .2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+// Rewrite values in flexgridcustom.scss
+
+$gutter-width: 2rem;
+
+$sm-max: 540px;
+$md-max: 720px;
+$lg-max: 980px;
+$xl-max: 1300px;
+
+$xs-breakpoint: 0;
+$sm-breakpoint: 576px;
+$md-breakpoint: 768px;
+$lg-breakpoint: 992px;
+$xl-breakpoint: 1370px;
+
+
+$grid-breakpoints: (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1400px);
+$container-max-widths: (sm: 540px, md: 720px, lg: 980px, xl: 1290px) !default;
