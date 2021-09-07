@@ -1,4 +1,4 @@
-import React, { ReactChildren, ReactPortal, useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useHistory, Link } from 'react-router-dom';
 import clsx from 'clsx';
 import { createStyles, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
@@ -14,22 +14,20 @@ import {
     ListItemIcon,
     ListItemText,
     ListItem,
-    Tabs,
-    Button,
-    Tab,
     MenuItem,
+    Grid,
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
-
-import { ROUTES } from '../../App';
 
 import style from './layout.module.scss';
 import { getPageMeta } from '../../helpers/utils';
 import ErrorPage from '../../containers/404/404';
+import { privateRoutes, publicRoutes } from '../../routes';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
+import { setUser } from '../../actions/actions';
+import { useDispatch } from 'react-redux';
 
 const drawerWidth = 240;
 
@@ -70,30 +68,33 @@ type LayoutType = {
 const Layout: React.FC<LayoutType> = ({ children, window, ...props }) => {
     const { pathname } = useLocation();
     const history = useHistory();
-    const pathToTabs = ['/schedule', '/travels', '/profile'].includes(pathname) ? pathname : null;
     const classes = useStyles();
     const theme = useTheme();
+    const dispatch = useDispatch();
+
+    const { isAuthorized } = useTypedSelector(state => state.user);
+
+    const routes = isAuthorized ? privateRoutes : publicRoutes;
+
+    const pageMeta = getPageMeta(routes, pathname.includes('/travels/') ? '/travels' : pathname);
     const [mobileOpen, setMobileOpen] = React.useState(false);
-    const [value, setValue] = useState(pathname === '/' ? '/schedule' : pathToTabs);
-    const [pageMeta, setPageMeta] = useState(getPageMeta(ROUTES, pathname));
 
     useEffect(() => {
         setMobileOpen(false);
-        setPageMeta(getPageMeta(ROUTES, pathname));
         if (pathname === '/') {
             history.push('/schedule');
         }
     }, [pathname]);
 
-    const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
-        setValue(newValue);
+    const logout = () => {
+        dispatch(setUser(false));
     };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
-    if (!pageMeta || !value) {
+    if (!pageMeta) {
         return <ErrorPage />;
     }
 
@@ -102,8 +103,13 @@ const Layout: React.FC<LayoutType> = ({ children, window, ...props }) => {
             <div className={classes.toolbar}>some title</div>
             <Divider />
             <List>
-                {ROUTES.map(({ title, path }, index) => (
-                    <MenuItem component={Link} to={path} key={title}>
+                {routes.map(({ title, path }, index) => (
+                    <MenuItem
+                        component={Link}
+                        to={path}
+                        selected={pathname.includes(path)}
+                        key={title}
+                    >
                         <ListItemIcon>
                             {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                         </ListItemIcon>
@@ -111,15 +117,19 @@ const Layout: React.FC<LayoutType> = ({ children, window, ...props }) => {
                     </MenuItem>
                 ))}
             </List>
-            <Divider />
-            <List>
-                <ListItem button>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Login" />
-                </ListItem>
-            </List>
+            {isAuthorized && (
+                <>
+                    <Divider />
+                    <List>
+                        <ListItem button onClick={logout}>
+                            <ListItemIcon>
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Logout" />
+                        </ListItem>
+                    </List>
+                </>
+            )}
         </div>
     );
 
@@ -154,6 +164,7 @@ const Layout: React.FC<LayoutType> = ({ children, window, ...props }) => {
                         </Drawer>
                     </Hidden>
 
+                    {/*page title*/}
                     <Typography className={classes.title} variant="h6" noWrap>
                         {pageMeta.title}
                     </Typography>
@@ -161,18 +172,18 @@ const Layout: React.FC<LayoutType> = ({ children, window, ...props }) => {
                     {/*Main menu*/}
                     <Hidden xsDown implementation="css">
                         <nav>
-                            <Tabs value={value} onChange={handleChange} aria-label="navigation">
-                                {ROUTES.map(({ title, path }) => (
-                                    <Tab
+                            <Grid container spacing={2}>
+                                {routes.map(({ title, path }) => (
+                                    <MenuItem
+                                        selected={pathname.includes(path)}
                                         component={Link}
-                                        value={path}
-                                        label={title}
                                         to={path}
-                                        color="inherit"
                                         key={title}
-                                    />
+                                    >
+                                        <ListItemText primary={title} />
+                                    </MenuItem>
                                 ))}
-                            </Tabs>
+                            </Grid>
                         </nav>
                     </Hidden>
                 </Toolbar>

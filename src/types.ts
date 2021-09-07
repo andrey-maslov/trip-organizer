@@ -2,6 +2,7 @@ import React from 'react';
 
 export type RouteType = {
     path: string;
+    exact: boolean;
     title: string;
     component: React.FunctionComponent;
 };

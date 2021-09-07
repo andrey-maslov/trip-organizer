@@ -1,13 +1,9 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
 
-export default ({ component: Component, auth, ...rest }: any) => (
+export default ({ component: Component, isAuthorized, ...rest }: any) => (
     <Route
         {...rest}
-        render={props =>
-            auth
-                ? <Component {...props} />
-                : <Redirect to="/login" />
-        }
+        render={props => (isAuthorized ? <Component {...props} /> : <Redirect to="/login" />)}
     />
 );
